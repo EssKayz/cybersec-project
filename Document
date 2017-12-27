@@ -1,0 +1,31 @@
+CODE : https://github.com/EssKayz/cybersec-project
+
+In order to identify the security vulnerabilities, one can start off by clicking the “Go To Login” Button.
+This will redirect any user to the admin login page. Initially, it might not be as straight forward to proceed from here, but the admin login details are actually found right in the html code’s JavaScript, which means that you can just copy-paste the details from the code, or even breakpoint in the code to skip all the validation, and just go straight to the part for a successful login.
+Another issue, is that anyone who navigates to the source code of the login site, can with minimal struggle just sneak to the actual admin page URL, by noticing that a successful login only redirects users to url/adminPage, which means that anyone can actually just bypass the login page, and go straight to the administration page that contains sensitive user information. 
+
+Another major issue with the website, is that on the main form of the website, the login name and address bars can be used to perform SQL injections. There is no validation whatsoever on the fields, and the java code is on purpose written in such a manner that Java itself will not catch the injections. This could be used to alter other users’ information, to remove entries from the database, or to entirely drop the database table, rendering the website useless.
+All in all, these vulnerabilities fulfill the OWASP Top-10 list parts : 
+A1-Injection (SQL injection in form)
+A2-Broken Authentication management (passwords visible in html)
+A5-Security misconfiguration (Default admin login and passwords)
+A6-Sensitive Data Exposure (Any and all user Data will be shown to anyone visiting url/adminPage)
+A7-Missing Function Level Access Control (No requests get verified, and anyone can visit /adminPage)
+
+In order to fix these, several steps are required.
+To fix the SQL injection, one would have to rewrite the SQL DAO (called interfDao in my project) methods so that the SQL statements are written using prepared statements, and replacing the + text + parts with the normally suggested ? marker, and assigning the values to the ?’s, essentially making it impossible for SQL injection to occur, as the text is never directly inserted into the queries.
+"INSERT INTO Address(name, address) VALUES ('" + name + "', '" + address + "');"; 
+should be changed to >
+ "INSERT INTO Address(name, address) VALUES (?, ?);" ; - and then using :
+stmt.setString(1, valueName); in order to assign the parameter valueName to the first occurrence of the questionmark to the query, and then doing the same for the address.
+
+For the Authentication management, the first step would be to externalize the Javascript from the html to the codebase itself, and then also moving the password and username somewhere outside of the .js / html code so that it isn’t at least as easy to figure out. After this, one could also consider using encryption methods to further obfuscate the password so that even if it was caught, it couldn’t be directly used without decryption.
+Security misconfiguration would be as easy to fix as simply making sure that all logins are hard enough to guess so that it would take a long time to brute force through the system, and also making sure that there is a maximum amount of requests from a single address, increasing the time of a brute force attack successfully getting through. Also, default error redirects should be caught, so that attackers don’t get clues about what they are doing wrong, or what they accomplished so far (For now, all error messages are displayed to the attacker in the form the server gives them!)
+
+Sensitive Data Exposure needs to be fixed in such a way that only the real administrator can get to the 
+user information, which would mean a proper session management system, so that the loginPage would be the only way to get to the /adminPage, providing the correct username and password. In addition to this, the admin page should also time out every now and then, to make sure nobody can hijack the session ID of the admin, and get in to the page through that way.
+
+The missing Function Level Access Control is an issue that could be fixed by verifying all inputs before executing them, e.g. any and all elements that aren’t supposed to be visible to anyone, should remain hidden. One should always deny all access by default, and then enable as user access elevation occurs. 
+This means, that this website should require users to create an account prior to registering to the form, so that for example the button “Go To Login” would be hidden from regular users altogether, and only elevated users would then be able to access the page that would then again require them to prove their elevated access by logging in again, or providing their password again. 
+However, none of this should be limited to user-side only. All checks should be validated on the server-side as well, to make sure that there has been no tampering to the source code of the scripts or local html files.
+
