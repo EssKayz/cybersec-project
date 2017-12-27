@@ -55,13 +55,10 @@ public class SignupController {
         List<String> items = new ArrayList<>();
         List<Address> addresses = new ArrayList<>();
         try {
-
             database = new Database("jdbc:sqlite:addressess.db");
             database.init();
 
             InterfDao dao = new InterfDao(database);
-
-            //dao.findAll().stream().forEach(dude -> items.add(dude.getName() + ", " + dude.getAddress()));
             addresses = dao.findAll();
             
         } catch (ClassNotFoundException ex) {

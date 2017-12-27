@@ -7,17 +7,6 @@
     <body>
 
         <p> This is a page. </p>
-
-        <table>
-      <tr>
-        <th>NAME</th>
-        <th>ADDRESS</th>
-      </tr>
-      <tr th:each="item  : ${infos}">
-        <td th:text="${item.name}">Name</td>
-        <td th:text="${item.address}">Address</td>
-      </tr>
-    </table>
         
         <ul>
             <li 
