@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Thank you!</title>
+    </head>
+    <body>
+
+        <p> This is a page. </p>
+
+        <table>
+      <tr>
+        <th>NAME</th>
+        <th>ADDRESS</th>
+      </tr>
+      <tr th:each="item  : ${infos}">
+        <td th:text="${item.name}">Name</td>
+        <td th:text="${item.address}">Address</td>
+      </tr>
+    </table>
+        
+        <ul>
+            <li 
+                th:each="item : ${infos}" 
+                th:text="${item}">Item description here...
+            </li>
+        </ul>
+
+    </body>
+</html>
